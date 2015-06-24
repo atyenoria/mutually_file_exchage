@@ -1,0 +1,62 @@
+#!/bin/bash
+# overview:start rsync process at local mac. this program is a part of remote_rsync
+# assumpiton: must install node npm pm2, rsync, fswatch at loacal mac
+# contact: eigotyoubunn30@gmail.com(atyenoria)
+# author: akinori ankajima
+# licence: MIT
+
+
+
+
+
+
+
+
+# initial settings
+SSH_MAC="mac" # you must set ~/.ssh/config at remote host
+MAC_SYNC=/Users/jima/work/rsyc_vagrant/test # local storage for remote host files or directories
+SUBLIME_COMMAND="s" # local mac's sublime text open command 
+
+
+
+
+
+
+
+
+###############################################################
+fullpath=`readlink -e $1`
+fullpath_base=`basename $fullpath`
+
+rsync --progress  -avz $fullpath $SSH_MAC:$MAC_SYNC
+
+[ -d $fullpath ] && ssh $SSH_MAC script_s $MAC_SYNC/$fullpath_base $fullpath DIR
+[ -d $fullpath ] || ssh $SSH_MAC script_s $MAC_SYNC/$fullpath_base $fullpath FILE
+
+ssh $SSH_MAC $SUBLIME_COMMAND $MAC_SYNC/$fullpath_base
+
+
+if [ -d $fullpath ]; then
+events="-e modify -e delete -e move -e create"
+inotifywait -mr --exclude ".*sw[px]|.*tm[px]|.*viminfo" --timefmt '%d/%m/%y %H:%M' --format '%T %w %f %e' \
+$events $fullpath | while read date time dir file action; do
+echo "$date $time $dir $file $action"
+rsync --progress -avz $fullpath/ $SSH_MAC:$MAC_SYNC/$fullpath_base
+done
+echo "end directory syncronyzation"
+else
+# under development
+# events="-e modify -e delete -e move -e create"
+# inotifywait -mr --exclude ".*sw[px]|.*tm[px]|.*viminfo" --timefmt '%d/%m/%y %H:%M' --format '%T %w %f %e' \
+# $events $fullpath | while read date time dir file action; do
+# sleep 2
+# echo "$date $time $dir $file $action"
+# # rsync --progress -avz $fullpath $SSH_MAC:$MAC_SYNC/$fullpath_base
+# # scp $fullpath $SSH_MAC:$MAC_SYNC/$fullpath_base
+# done
+echo "file is not mutually exchanged"
+fi
+
+
+
+

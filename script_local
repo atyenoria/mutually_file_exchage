@@ -1,0 +1,54 @@
+#!/bin/bash
+# overview:start rsync process at local mac. this program is a part of remote_rsync
+# assumpiton: must install node npm pm2, rsync, fswatch at loacal mac
+# contact: eigotyoubunn30@gmail.com(atyenoria)
+# author: akinori ankajima
+# licence: MIT
+
+
+
+
+
+
+
+
+#initial settings
+TMP_PM2=~/myshell/pm2/ # for temporal file
+SSH_REMOTE="vagrant" #you must set ~/.ssh/config at local host
+
+
+
+
+
+
+################################################################
+[ -d ~/myshell/pm2 ] || mkdir -p ~/myshell/pm2 && echo "create ~/myshell/pm2"
+TMP=$TMP_PM2`basename $1`.sh
+
+[ $3 == "DIR" ] && cat <<EOF > $TMP  
+F=$1
+S=$2
+
+fswatch -0 $1 | while read -d "" event 
+do 
+    rsync --progress --delete -avz \$F/ $SSH_REMOTE:\$S
+done
+EOF
+
+
+[ $3 == "FILE" ] && cat <<EOF > $TMP  
+F=$1
+S=$2
+
+fswatch -0 $1 | while read -d "" event 
+do
+sleep 2.5
+scp \$F $SSH_REMOTE:\$S
+# under construction
+# scp -P 22 \$F $SSH_REMOTE:\$S >> log.pm2
+#rsync --progress --delete -rlpgoD \$F $SSH_REMOTE:\$S
+done
+EOF
+
+pm2 start $TMP
+pm2 restart $TMP

@@ -12,7 +12,7 @@
 
 
 
-#initial settings
+# initial settings
 TMP_PM2=~/myshell/pm2/ # for temporal file
 SSH_REMOTE="vagrant" #you must set ~/.ssh/config at local host
 

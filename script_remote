@@ -1,5 +1,5 @@
 #!/bin/bash
-# overview:start rsync process at local mac. this program is a part of remote_rsync
+# overview:start rsync process at local mac. this program is a part of remote_rsync. This file is set to remote host
 # assumpiton: must install node npm pm2, rsync, fswatch at loacal mac
 # contact: eigotyoubunn30@gmail.com(atyenoria)
 # author: akinori ankajima
@@ -20,18 +20,15 @@ SUBLIME_COMMAND="s" # local mac's sublime text open command
 
 
 
-
-
-
-
 ###############################################################
 fullpath=`readlink -e $1`
 fullpath_base=`basename $fullpath`
 
 rsync --progress  -avz $fullpath $SSH_MAC:$MAC_SYNC
 
-[ -d $fullpath ] && ssh $SSH_MAC script_s $MAC_SYNC/$fullpath_base $fullpath DIR
-[ -d $fullpath ] || ssh $SSH_MAC script_s $MAC_SYNC/$fullpath_base $fullpath FILE
+[ -d $fullpath ] || [ -f $fullpath ] && echo "no file or directory" && exit 1
+[ -d $fullpath ] && ssh $SSH_MAC script_local $MAC_SYNC/$fullpath_base $fullpath DIR
+[ -d $fullpath ] || ssh $SSH_MAC script_local $MAC_SYNC/$fullpath_base $fullpath FILE
 
 ssh $SSH_MAC $SUBLIME_COMMAND $MAC_SYNC/$fullpath_base
 

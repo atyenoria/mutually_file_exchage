@@ -21,10 +21,10 @@ SUBLIME_COMMAND="s" # local mac's sublime text open command
 
 
 ###############################################################
+[ -d $1 ] || [ -f $1 ] || exit 0
+
 fullpath=`readlink -e $1`
 fullpath_base=`basename $fullpath`
-
-[ -d $fullpath ] || [ -f $fullpath ] || exit 1
 
 rsync --progress  -avz $fullpath $SSH_MAC:$MAC_SYNC
 [ -d $fullpath ] && ssh $SSH_MAC script_local $MAC_SYNC/$fullpath_base $fullpath DIR

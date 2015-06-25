@@ -18,9 +18,6 @@ SSH_REMOTE="vagrant" #you must set ~/.ssh/config at local host
 
 
 
-
-
-
 ################################################################
 [ -d ~/myshell/pm2 ] || mkdir -p ~/myshell/pm2 && echo "create ~/myshell/pm2"
 TMP=$TMP_PM2`basename $1`.sh

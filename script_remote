@@ -38,7 +38,7 @@ events="-e modify -e delete -e move -e create"
 inotifywait -mr --exclude ".*sw[px]|.*tm[px]|.*viminfo" --timefmt '%d/%m/%y %H:%M' --format '%T %w %f %e' \
 $events $fullpath | while read date time dir file action; do
 echo "$date $time $dir $file $action"
-rsync --progress -avz $fullpath/ $SSH_MAC:$MAC_SYNC/$fullpath_base
+rsync --progress --delete -avz $fullpath/ $SSH_MAC:$MAC_SYNC/$fullpath_base
 done
 echo "end directory syncronyzation"
 else

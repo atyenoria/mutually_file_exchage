@@ -18,7 +18,7 @@ MAC_SYNC=/Users/jima/work/rsyc_vagrant/test # local storage for remote host file
 SUBLIME_COMMAND="s" # local mac's sublime text open command 
 
 
-OWNER=`ls -ld rsyslog-stats | awk '{ print \$3 '}`
+
 
 
 ##########################################################################################################
@@ -27,6 +27,8 @@ OWNER=`ls -ld rsyslog-stats | awk '{ print \$3 '}`
 fullpath=`readlink -e $1`
 fullpath_base=`basename $fullpath`
 
+
+OWNER=`ls -ld $fullpath | awk '{ print \$3 '}`
 
 [ OWNER == "root" ] && echo "this owner"
 [ OWNER == "root" ] || echo "not owner"

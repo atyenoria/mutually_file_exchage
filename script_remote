@@ -18,15 +18,23 @@ MAC_SYNC=/Users/jima/work/rsyc_vagrant/test # local storage for remote host file
 SUBLIME_COMMAND="s" # local mac's sublime text open command 
 
 
+OWNER=`ls -ld rsyslog-stats | awk '{ print \$3 '}`
 
 
-###############################################################
+##########################################################################################################
 [ -d $1 ] || [ -f $1 ] || exit 0
 
 fullpath=`readlink -e $1`
 fullpath_base=`basename $fullpath`
 
-rsync --progress  -avz $fullpath $SSH_MAC:$MAC_SYNC
+
+[ OWNER == "root" ] && echo "this owner"
+[ OWNER == "root" ] || echo "not owner"
+
+
+[ OWNER == "root" ] && rsync --progress --delete --rsync-path="sudo rsync" -avz $fullpath $SSH_MAC:$MAC_SYNC
+[ OWNER == "root" ] || rsync --progress --delete -avz $fullpath $SSH_MAC:$MAC_SYNC
+
 [ -d $fullpath ] && ssh $SSH_MAC script_local $MAC_SYNC/$fullpath_base $fullpath DIR
 [ -d $fullpath ] || ssh $SSH_MAC script_local $MAC_SYNC/$fullpath_base $fullpath FILE
 
@@ -38,7 +46,10 @@ events="-e modify -e delete -e move -e create"
 inotifywait -mr --exclude ".*sw[px]|.*tm[px]|.*viminfo" --timefmt '%d/%m/%y %H:%M' --format '%T %w %f %e' \
 $events $fullpath | while read date time dir file action; do
 echo "$date $time $dir $file $action"
-rsync --progress --delete -avz $fullpath/ $SSH_MAC:$MAC_SYNC/$fullpath_base
+
+[ OWNER == "root" ] && rsync --progress --delete --rsync-path="sudo rsync" -avz $fullpath $SSH_MAC:$MAC_SYNC
+[ OWNER == "root" ] || rsync --progress --delete -avz $fullpath $SSH_MAC:$MAC_SYNC
+
 done
 echo "end directory syncronyzation"
 else

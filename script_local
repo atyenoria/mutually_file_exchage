@@ -20,6 +20,11 @@ OWNER="$4"
 
 
 
+
+
+#rootファイルの場合は強制終了
+[ $OWNER == "root" ] && exit 0
+
 #pm2 の実行ファイル置き場の作成
 [ -d $TMP_PM2 ] || mkdir -p $TMP_PM2 && echo "create $TMP_PM2"
 TMP=$TMP_PM2`basename $1`.sh
@@ -45,7 +50,7 @@ S=$2
 fswatch -0 $1 | while read -d "" event 
 do
 sleep 2.5
-[ $OWNER == "root" ] && sudo scp \$F $SSH_REMOTE:\$S
+[ $OWNER == "root" ] && rsync --progress --delete -rlpgoD --rsync-path="sudo rsync" \$F $SSH_REMOTE:\$S
 [ $OWNER == "root" ] || scp \$F $SSH_REMOTE:\$S
 # under construction
 # scp -P 22 \$F $SSH_REMOTE:\$S >> log.pm2

@@ -16,9 +16,11 @@
 TMP_PM2=/Users/jima/work/digital_ocean/src_github/mutually_file_exchage/tmp/ # for temporal file
 SSH_REMOTE="vagrant" #you must set ~/.ssh/config at local host
 
+OWNER="$4"
 
 
-################################################################
+
+#pm2 の実行ファイル置き場の作成
 [ -d $TMP_PM2 ] || mkdir -p $TMP_PM2 && echo "create $TMP_PM2"
 TMP=$TMP_PM2`basename $1`.sh
 
@@ -28,7 +30,10 @@ S=$2
 
 fswatch -0 $1 | while read -d "" event 
 do 
-    rsync --progress --delete -avz --rsync-path="sudo rsync" \$F/ $SSH_REMOTE:\$S
+
+[ $OWNER == "root" ] && rsync --progress --delete -avz --rsync-path="sudo rsync" \$F/ $SSH_REMOTE:\$S
+[ $OWNER == "root" ] || rsync --progress --delete -avz \$F/ $SSH_REMOTE:\$S
+
 done
 EOF
 
@@ -40,7 +45,8 @@ S=$2
 fswatch -0 $1 | while read -d "" event 
 do
 sleep 2.5
-scp \$F $SSH_REMOTE:\$S
+[ $OWNER == "root" ] && sudo scp \$F $SSH_REMOTE:\$S
+[ $OWNER == "root" ] || scp \$F $SSH_REMOTE:\$S
 # under construction
 # scp -P 22 \$F $SSH_REMOTE:\$S >> log.pm2
 #rsync --progress --delete -rlpgoD \$F $SSH_REMOTE:\$S

@@ -30,15 +30,12 @@ fullpath_base=`basename $fullpath`
 
 OWNER=`ls -ld $fullpath | awk '{ print \$3 '}`
 
-[ $OWNER == "root" ] && echo "this owner"
-[ $OWNER == "root" ] || echo "not owner"
-
 
 [ $OWNER == "root" ] && rsync --progress --delete --rsync-path="sudo rsync" -avz $fullpath $SSH_MAC:$MAC_SYNC
 [ $OWNER == "root" ] || rsync --progress --delete -avz $fullpath $SSH_MAC:$MAC_SYNC
 
-[ -d $fullpath ] && ssh $SSH_MAC script_local $MAC_SYNC/$fullpath_base $fullpath DIR
-[ -d $fullpath ] || ssh $SSH_MAC script_local $MAC_SYNC/$fullpath_base $fullpath FILE
+[ -d $fullpath ] && ssh $SSH_MAC script_local $MAC_SYNC/$fullpath_base $fullpath DIR $OWNER
+[ -d $fullpath ] || ssh $SSH_MAC script_local $MAC_SYNC/$fullpath_base $fullpath FILE $OWNER
 
 ssh $SSH_MAC $SUBLIME_COMMAND $MAC_SYNC/$fullpath_base
 
